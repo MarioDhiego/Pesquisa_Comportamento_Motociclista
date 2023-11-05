@@ -1,9 +1,8 @@
-
-
-################################################################################
+########################################################
 # Ativar os Pacotes 
 library(likert)
 library(readxl)
+
 library(dplyr)
 library(plyr)
 library(plotly)
@@ -13,33 +12,40 @@ library(table1)
 library(flextable)
 library(RColorBrewer)
 library(rstatix)
-################################################################################
+#########################################################
 
 
-################################################################################
+#########################################################
 # Definir Diretório de Trabalho
 
-setwd("C:/Users/mario.valente/Documents/GitHub_scripts")
-################################################################################
+setwd("C:/Users/mario Dhiego/Documents/Pesquisa_Clima_Likert/Pesquisa-de-Clima-Organizacional-na-Escala-Likert")
 
 
-################################################################################
+
+#########################################################
+
+
+#########################################################
 # Leitura de Base de Dados
 Dados_Clima <- read_excel("Dados_Clima.xls")
 
 
-Dados_Clima[,1:9] <- lapply(Dados_Clima[,1:9], factor, levels=1:5,
+
+
+Dados_Clima[,1:9] <- lapply(Dados_Clima[,1:9], 
+                            factor, 
+                            levels=1:5,
                             labels = c("Sempre", 
                                        "Quase Sempre", 
                                        "Raramente", 
                                        "Nunca", 
                                        "Não Tenho Opnião"),
                             order = TRUE)
-################################################################################
+###################################################################
 
 
 
-################################################################################
+###################################################################
 #Definir Tipos de variáveis
 
 my.render.cont <- function(x) {
@@ -56,7 +62,7 @@ my.render.cat <- function(x) {
 
 
 
-################################################################################
+###################################################################
 # Função Calcular P-valor das variáveis:contínuas/categóricas.
 
 
@@ -75,12 +81,12 @@ pvalue <- function(x, ...) {
   # The initial empty string places the output on the line below the variable label.
   c("", sub("<", "&lt;", format.pval(p, digits=3, eps=0.001)))
 }
-################################################################################
+###################################################################
 
 
 
 
-################################################################################
+###################################################################
 #Tabela dos Itens 
 
 caption  <- "Pesquisa de Clima Organizacional"
@@ -96,21 +102,21 @@ table1(~.,
        footnote = footnote,
        #topclass="Rtable1-grid Rtable1-shade Rtable1-times",
        topclass = "Rtable1-zebra",
-       render.continuous=my.render.cont,
-       render.categorical=my.render.cat
+       #render.continuous=my.render.cont,
+       #render.categorical=my.render.cat
        #extra.col=list(`P-value`=pvalue)
-       )
+)
 ################################################################################
 
 
-################################################################################
+###################################################################
 # Nomear as Categorias Likert
 nomes <- read_excel("Dados_Clima.xls", sheet = 3)
 colnames(Dados_Clima)[1:9] <- nomes$Nomes
 table1(~., data = Dados_Clima, overall = "n(%)", decimal.mark = ",")
 
 
-################################################################################
+###################################################################
 # Gerar Plot Likert
 dados_grafico <- likert(as.data.frame(Dados_Clima[1:9]))
 
@@ -118,7 +124,7 @@ paleta <- brewer.pal(5, "RdBu")
 paleta[3] <- "#DFDFDF"
 
 
-g1 <- likert.bar.plot(dados_grafico, text.size=4)+
+g1 <- likert.bar.plot(dados, text.size=4)+
   theme(axis.text.y=element_text(size="12"))+
   labs(x="", y = "Frequência (%)", size=12)+
   ggtitle("Pesquisa de Clima Organizacional")+

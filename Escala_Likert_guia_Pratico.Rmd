@@ -1,0 +1,301 @@
+---
+title: "**Escala Likert no R: um Guia Prático**"
+author:
+- name: Mário Diego Valente
+- name: Carlos Paixão
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document: 
+    code_download: yes
+    highlight: textmate
+    number_sections: yes
+    theme: cerulean
+    toc: yes
+    toc_depth: 6
+    toc_float:
+      collapsed: yes
+      smooth_scroll: yes
+    keep_md: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '6'
+institute:
+abstract: "A Escala Likert é um tipo de Resposta Psicométrica usada em Questionários sendo a mais usada em Pesquisas de Opnião. O objetivo deste guia é apresentar de forma metodológica como realizar e interpretar uma escala likert nas Pesquisas de Clima Organizacional na linguagem de Programação R."
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+```{=html}
+<style>
+body{text-align: justify}
+</style>
+```
+
+
+::: progress
+::: {.progress-bar style="width: 100%;"}
+:::
+:::
+
+
+# **Escala Likert**
+## **Introdução**
+
+A escala likert ou escala de likert, é um tipo de escala psicométrica usada habitualmente em questionários, sendo a7 mais usada em pesquisa de opnião.
+
+A escala de Likert é bipolar, medindo ou uma resposta positiva ou negativa a uma afirmação. Às vezes são usados quatro itens, o que força o sujeito pesquisado a uma escolha positiva ou negativa, uma vez que a opção central "Indiferente" não existe
+
+
+
+
+::: progress
+::: {.progress-bar style="width: 100%;"}
+:::
+:::
+
+## **Rensis Likert(1903-1981)**
+
+Rensis Likert recebeu seu bacharelado em Sociologia pela Universidade de Michigan em 1926. Seu entrada precoce nestas áreas foi a base para muito do trabalho de Likert. 
+
+O campo da sociologia na década de 1920 foi altamente experimental eincorporou muitos aspectos da psicologia moderna. 
+
+Em 1932 recebeu seu Ph.D. em psicologia pela Universidadede Columbia. Por seu trabalho de tese, produzidos numa escala de pesquisa (Escalas de Likert), como um meio de medir atitudes, mostrando que é captada mais informação do que os métodos concorrentes
+
+
+
+LIKERT ganhou notoriedade por ter desenvolvido a chamada **“Escala de Atitudes”** – um questionário em que as hipóteses de resposta eram do tipo: 
+
+-   Discordo ou (Não Concordo) Totalmente;
+-   Discordo ou (Não Concordo) Parcialmente;
+-   Indiferente;
+-   Concordo Parcialmente;
+-   Concordo Totalmente
+
+
+Em 1961 no livro NEW PATTERNS OF MANAGEMENT (“Novos Padrões de Gestão”) mostra os resultados de suas pesquisas iniciadas, ainda na década de 50, que obtiveram grande repercussão na TEORIA COMPORTAMENTAL nos estudos sobre LIDERANÇA. O estudo de LIKERT não eliminou as Teorias sobre a LIDERANÇA, porém, ampliou o conceito
+
+
+
+::: progress
+::: {.progress-bar style="width: 100%;"}
+:::
+:::
+
+
+# **Visualização Gráfica**
+
+Para mensuração do satisfação em relação ao clima organizacional dos funcionários do DETRAN-PA  foi implementada um script no software R-Project versão 4.3 e um ambiente de desenvolvimento integrado chamado Rstudio versão 1.1.5 com uso dos pacotes:
+
+
+
+## **Carregando os Pacotes**
+
+```{r message=FALSE, warning=FALSE}
+# Ativar os Pacotes 
+library(likert)
+library(readxl)
+library(dplyr)
+library(plyr)
+library(plotly)
+library(ggplot2)
+library(table1)
+library(flextable)
+library(RColorBrewer)
+library(rstatix)
+```
+
+
+
+## **Definir Diretório de Trabalho**
+
+```{r message=FALSE, warning=FALSE}
+
+setwd("C:/Users/mario Dhiego/Documents/Pesquisa_Clima_Likert/Pesquisa-de-Clima-Organizacional-na-Escala-Likert")
+
+```
+
+
+## **Bases de Dados**
+
+```{r message=FALSE, warning=FALSE}
+
+Dados_Clima <- read_excel("Dados_Clima.xls")
+Dados_Clima[,1:4] <- lapply(Dados_Clima[,1:4], 
+                            factor, 
+                            levels=1:5,
+                            labels = c("Sempre", 
+                                       "Quase Sempre", 
+                                       "Raramente", 
+                                       "Nunca", 
+                                       "Não Tenho Opnião"),
+                            order = TRUE)
+
+```
+
+
+
+## **Tabelas dos Itens**
+
+```{r message=FALSE, warning=FALSE}
+
+my.render.cont <- function(x) {
+  with(stats.apply.rounding(stats.default(x), digits = 2), 
+       c("", "Mean (SD)"=sprintf("%s (&plusmn; %s)", MEAN, SD)))
+}
+my.render.cat <- function(x) {
+  c("", sapply(stats.default(x), 
+               function(y) with(y,
+  sprintf("%d (%0.0f %%)", FREQ, PCT))))
+}
+
+caption  <- "Pesquisa de Clima Organizacional"
+footnote <- "Fonte: RH/DETRAN-PA"
+
+# Tabela de Frequência
+table1(~., 
+       data = Dados_Clima,
+       #ctable = TRUE,
+       overall = "Total (%)",
+       #overall = F,
+       #decimal.mark = ",",
+       caption = caption, 
+       footnote = footnote,
+       #topclass="Rtable1-grid Rtable1-shade Rtable1-times",
+       topclass = "Rtable1-zebra",
+       #render.continuous=my.render.cont,
+       #render.categorical=my.render.cat
+       #extra.col=list(`P-value`=pvalue)
+)
+```
+
+
+::: progress
+::: {.progress-bar style="width: 100%;"}
+:::
+:::
+
+
+## **Incluir Nomes das Perguntas**
+
+```{r eval=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+nomes <- read_excel("Dados_Clima.xls", sheet = 3)
+colnames(Dados_Clima)[1:4] <- nomes$Nomes
+
+table1(~., data = Dados_Clima, overall = "Total (%)", decimal.mark = ",")
+```
+
+
+
+
+## **Likert Bar Plot**
+
+```{r message=FALSE, warning=FALSE}
+
+Dados_grafico1 <- likert(as.data.frame(Dados_Clima[1:4]))
+paleta <- brewer.pal(5, "RdBu")
+paleta[3] <- "#DFDFDF"
+
+grafico1 <- likert.bar.plot(Dados_grafico1, 
+                      text.size = 4,
+                      centered= FALSE)+
+  theme(axis.text.y = element_text(size = "12"),
+        legend.position = "bottom",
+        axis.title = element_text(size = 12, face = "bold"))+
+  labs(x = "", y = "Frequência (%)", size = 12)+
+  ggtitle("Pesquisa de Clima Organizacional")+
+  scale_fill_manual(values = paleta,
+                    breaks = levels(Dados_Clima$`Orientações que Vc Recebe sobre o seu Trabalho são Claras/Objetivas?`))+
+  guides(fill = guide_legend(title = "Resposta"))+
+  theme_minimal()+
+  theme(panel.grid = element_blank(),
+        plot.background = element_rect(fill = "white"))
+ggplotly(grafico1)
+```
+
+
+
+
+
+::: progress
+::: {.progress-bar style="width: 100%;"}
+:::
+:::
+
+
+## **Likert Bar Plot p/ Grupos**
+
+
+```{r message=FALSE, warning=FALSE}
+# Gerar Plot Likert p/ Grupos
+dados_grafico_grupo <- likert(as.data.frame(Dados_Clima[1:4]),
+                              grouping = Dados_Clima$GENERO)
+
+
+grafico2 <- likert.bar.plot(dados_grafico_grupo, 
+                      text.size = 4,
+                      centered = FALSE)+
+  theme(axis.text.y = element_text(size ="12"))+
+  labs(x = "", y = "Frequencia (%)", size =12)+
+  ggtitle("Pesquisa de Clima Organizacional")+
+  scale_fill_manual(values = paleta,
+                    breaks = levels(Dados_Clima$`Orientações que Vc Recebe sobre o seu Trabalho são Claras/Objetivas?`))+
+  guides(fill = guide_legend(title = "Resposta"))+
+  theme_minimal()+
+  theme(panel.grid = element_blank(),
+        plot.background = element_rect(fill = "white"))
+ggplotly(grafico2)
+```
+
+
+::: progress
+::: {.progress-bar style="width: 100%;"}
+:::
+:::
+
+
+## **Likert Heat Plot**
+
+
+```{r message=FALSE, warning=FALSE}
+Dados_grafico2 <- likert(as.data.frame(Dados_Clima[1:4]))
+
+likert.heat.plot(Dados_grafico2,
+                 text.size = 4,
+                 centered= FALSE)
+```
+
+
+::: progress
+::: {.progress-bar style="width: 100%;"}
+:::
+:::
+
+## **Salvar o Likert Plot**
+
+```{r message=TRUE, warning=TRUE}
+ggsave("Plot1_likert.png", width = 13, height = 6)
+
+```
+
+
+
+# **Referências Bibliográficas**
+
+
+BERGAMINI, CECÍLIA WHITAKER. Motivação nas Organizações. Editora Atlas. Edição 4ª. São Paulo, 1997.
+
+LIKERT, RENSIS. Novos Padrões De Administração. Editora Pioneira. Edição 3ª. São Paulo, 1971.
+
+
+
+
+::: progress
+::: {.progress-bar style="width: 100%;"}
+:::
+:::

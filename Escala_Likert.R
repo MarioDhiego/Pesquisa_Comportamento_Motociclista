@@ -11,6 +11,7 @@ library(table1)
 library(flextable)
 library(RColorBrewer)
 library(rstatix)
+library(haven)
 #########################################################
 
 
@@ -27,6 +28,9 @@ Dados_Clima <- read_excel("Dados_Clima.xls")
 Dados_Motociclista <- read_excel("Dados_motociclista.xls")
 Dados_Motorista <- read_excel("Dados_motorista.xls")
 
+teste_spps <- read_spss("CLIMA_ORGANIZACIONAL.sav")
+
+
 Dados_Clima[,1:9] <- lapply(Dados_Clima[,1:9], 
                             factor, 
                             levels=1:5,
@@ -38,11 +42,14 @@ Dados_Clima[,1:9] <- lapply(Dados_Clima[,1:9],
                             order = TRUE)
 
 
+
+
 Dados_Motociclista[,1:6] <- lapply(Dados_Motociclista[,1:6], 
                             factor, 
-                            levels=1:2,
+                            levels=1:3,
                             labels = c("Sim", 
-                                       "Não"),
+                                       "Não",
+                                       "Não Informado"),
                             order = TRUE)
 ###################################################################
 
